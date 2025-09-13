@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { JSDOM } = require('jsdom');
 
 async function getLeetcodeProfile(username) {
     try {
@@ -56,9 +57,36 @@ async function getLeetcodeProfile(username) {
         };
 
     } catch (err) {
-        console.log('Service error:', err.message);
+        console.log('Leetcode Service error:', err.message);
         return { error: 'SERVICE ERROR' };
     }
 }
 
-module.exports = { getLeetcodeProfile };
+async function getCodechefProfile(username) {
+    try {
+        const url = `https://www.codechef.com/users/${username}`;
+        const { data } = await axios.get(url);
+
+        const document = new JSDOM(data).window.document;
+
+        const rating = document.querySelector('.rating-number')?.textContent.trim() || 'N/A';
+
+        const rankElems = document.querySelectorAll('.rating-ranks a strong');
+        const globalRank = rankElems[0] ? parseInt(rankElems[0].textContent) : 0;
+        const countryRank = rankElems[1] ? parseInt(rankElems[1].textContent) : 0;
+
+        const totalSolvedH3 = document.querySelector('.problems-solved h3:last-of-type')?.textContent;
+        const totalSolved = totalSolvedH3 ? parseInt(totalSolvedH3.match(/\d+/)[0]) : 0;
+        
+        const contests = document.querySelectorAll('.problems-solved .content');
+        const contestsAttended = contests.length;
+
+        return { username, rating, globalRank, countryRank, totalSolved, contestsAttended };
+
+    } catch (err) {
+        console.log('CodeChef service error:', err.message);
+        return { error: 'SERVICE ERROR' };
+    }
+}
+
+module.exports = { getLeetcodeProfile , getCodechefProfile };
