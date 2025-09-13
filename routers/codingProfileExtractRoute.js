@@ -5,5 +5,6 @@ const codingProfileExtractController = require('../controllers/codingProfileExtr
 
 router.get('/leetcode/:username',codingProfileExtractController.getLeetcode);
 router.get('/codechef/:username',codingProfileExtractController.getCodechef);
+router.get('/codeforce/:username',codingProfileExtractController.getCodeforce);
 
 module.exports = router;

@@ -58,7 +58,7 @@ async function getLeetcodeProfile(username) {
 
     } catch (err) {
         console.log('Leetcode Service error:', err.message);
-        return { error: 'SERVICE ERROR' };
+        return { error: 'LEETCODE SERVICE ERROR' };
     }
 }
 
@@ -71,13 +71,13 @@ async function getCodechefProfile(username) {
 
         const rating = document.querySelector('.rating-number')?.textContent.trim() || 'N/A';
 
-        const rankElems = document.querySelectorAll('.rating-ranks a strong');
-        const globalRank = rankElems[0] ? parseInt(rankElems[0].textContent) : 0;
-        const countryRank = rankElems[1] ? parseInt(rankElems[1].textContent) : 0;
+        const rank = document.querySelectorAll('.rating-ranks a strong');
+        const globalRank = rank[0] ? parseInt(rank[0].textContent) : 0;
+        const countryRank = rank[1] ? parseInt(rank[1].textContent) : 0;
 
-        const totalSolvedH3 = document.querySelector('.problems-solved h3:last-of-type')?.textContent;
-        const totalSolved = totalSolvedH3 ? parseInt(totalSolvedH3.match(/\d+/)[0]) : 0;
-        
+        const temph3 = document.querySelector('.problems-solved h3:last-of-type')?.textContent;
+        const totalSolved = temph3 ? parseInt(temph3.match(/\d+/)[0]) : 0;
+
         const contests = document.querySelectorAll('.problems-solved .content');
         const contestsAttended = contests.length;
 
@@ -85,8 +85,28 @@ async function getCodechefProfile(username) {
 
     } catch (err) {
         console.log('CodeChef service error:', err.message);
-        return { error: 'SERVICE ERROR' };
+        return { error: 'CODECHEF SERVICE ERROR' };
     }
 }
 
-module.exports = { getLeetcodeProfile , getCodechefProfile };
+
+async function getCodeforceProfile(username) {
+    try {
+        const { data } = await axios.get(`https://codeforces.com/api/user.info?handles=${username}`);
+        if (data.status !== 'OK') throw new Error('User not found');
+
+        const user = data.result[0];
+
+        return {
+            username: user.handle,
+            rating: user.rating || 0,
+            maxRating: user.maxRating || 0,
+            rankTitle: user.rank || 'N/A'
+        };
+    } catch (err) {
+        console.log('Codeforces service error:', err.message);
+        return { error: 'CODEFORCES SERVICE ERROR' };
+    }
+}
+
+module.exports = { getLeetcodeProfile , getCodechefProfile , getCodeforceProfile};

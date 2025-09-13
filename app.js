@@ -6,7 +6,7 @@ const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use('/webscrap',route);
+app.use('/',route);
 
 module.exports = app;
 
